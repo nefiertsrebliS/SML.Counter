@@ -1,0 +1,14 @@
+{
+	"id": "{BECED55E-0354-9626-857B-D4B64366A2EA}",
+	"name": "SML_Electricity",
+	"type": 3,
+	"vendor": "SML",
+	"aliases": 
+	[
+		"SML Elektrizität"
+	],
+	"parentRequirements": ["{79827379-F36E-4ADA-8A95-5F8D1DC92FA9}"],
+	"childRequirements": [],
+	"implemented": ["{018EF6B5-AB94-40C6-AA53-46943E824ACF}"],
+	"prefix": "SML"
+}

@@ -1,0 +1,6 @@
+{
+  "elements":
+  [
+    { "type": "NumberSpinner", "name": "Update", "caption": "Updateinterval", "suffix": "Seconds" }
+  ]
+}
