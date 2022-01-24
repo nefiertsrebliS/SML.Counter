@@ -44,7 +44,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-Das Modul wertet die vom Zähler freigegebenen Daten aus.
-Das Repository wird über GitHub bereitgestellt und über Module Control eingebunden.
-Es ist einfach gehalten und benötigt nur die Eingabe der Daten je nach Auswahl der Schnittstelle.
