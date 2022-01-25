@@ -72,76 +72,80 @@ class SML_Electricity extends IPSModule
         $Items = explode("\x01\x77\x07\x01\x00", utf8_decode($data->Buffer));
 
         foreach ($Items as $Item) {
+            $Typ = $this->Index(substr($Item, 0,1));
+
+            if($Typ == 0 || $Typ > 95) continue;    # keine Zählerdaten
+
             $Index = $this->Index(substr($Item, 0,3));
             $this->SendDebug($Index, $Item, 1);
-            switch ($Index) {
-                case '1.8.0':
-                case '2.8.0':
-                    $result = stristr($Item, chr(0x621E));
-                    $scaler = $this->Scaler(substr($result, 2, 1));
-                    $value = hexdec($this->Str2Hex(substr($result, 4))) * $scaler / 1000;
-                    $this->SendDebug('Value', $value, 0);
-                    $this->AddValue($Index, round($value, 2), '~Electricity');
-                    break;
-                
-                case '16.7.0':
-                    $result = stristr($Item, chr(0x621B));
-                    $scaler = $this->Scaler(substr($result, 2, 1));
-                    $value = hexdec($this->Str2Hex(substr($result, 4))) * $scaler;
-                    $this->SendDebug('Value', $value, 0);
-                    $this->AddValue($Index, $value, '~Watt');
-                    break;
+            $pos = 3;
 
-                case '32.7.0':
-                case '52.7.0':                    
-                case '72.7.0':
-                    $result = stristr($Item, chr(0x6223));
-                    $scaler = $this->Scaler(substr($result, 2, 1));
-                    $value = hexdec($this->Str2Hex(substr($result, 4))) * $scaler;
-                    $this->SendDebug('Value', $value, 0);
-                    $this->RegisterVariableFloat(md5($Index), $Index, '~Volt');
-                    $this->AddValue($Index, $value, '~Volt');
-                    break;
+            if($this->length($Item, $pos) == 158){
+                $pos++;
+                $length = $this->length($Item, $pos);
+                $pos += $length+1;
+                $length = $this->length($Item, $pos);
 
-                case '31.7.0':
-                case '51.7.0':                    
-                case '71.7.0':
-                    $result = stristr($Item, chr(0x6221));
-                    $scaler = $this->Scaler(substr($result, 2, 1));
-                    $value = hexdec($this->Str2Hex(substr($result, 4))) * $scaler;
-                    $this->SendDebug('Value', $value, 0);
-                    $this->RegisterVariableFloat(md5($Index), $Index, '~Ampere');
-                    $this->AddValue($Index, $value, '~Ampere');
-                    break;
+                # Sonderdaten #########################################################
+                if($length == 17){
+                    $pos++;
+                    $length = $this->length($Item, $pos);
+                    $pos += $length+1;
+                    $length = $this->length($Item, $pos);
+                    $pos += $length;
+                }
+                $pos++;
+                $length = $this->length($Item, $pos);
 
-                case '81.7.1':
-                case '81.7.2':                    
-                case '81.7.4':
-                case '81.7.15':                    
-                case '81.7.26':
-                    $result = stristr($Item, chr(0x6208));
-                    $scaler = $this->Scaler(substr($result, 2, 1));
-                    $value = hexdec($this->Str2Hex(substr($result, 4))) * $scaler;
-                    $this->SendDebug('Value', $value, 0);
-                    if (!IPS_VariableProfileExists('Angle.EHZ')) {
-                        IPS_CreateVariableProfile('Angle.EHZ', 2);
-                        IPS_SetVariableProfileIcon('Angle.EHZ', 'Link');
-                        IPS_SetVariableProfileText('Angle.EHZ', '', ' °');
-                        IPS_SetVariableProfileDigits('Angle.EHZ', 1);
-                    }
-                    $this->AddValue($Index, $value, 'Angle.EHZ');
-                    break;
+                # Unit   ##############################################################
+                $scaler = 1;
+                switch ($this->Value($Item, $pos)) {
+                    case 8:
+                        if (!IPS_VariableProfileExists('Angle.EHZ')) {
+                            IPS_CreateVariableProfile('Angle.EHZ', 2);
+                            IPS_SetVariableProfileIcon('Angle.EHZ', 'Link');
+                            IPS_SetVariableProfileText('Angle.EHZ', '', ' °');
+                            IPS_SetVariableProfileDigits('Angle.EHZ', 1);
+                        }
+                        $unit = 'Angle.EHZ';
+                        break;
+                    case 27:
+                    case 29:
+                        $unit = '~Watt';
+                        break;
+                    case 30:
+                    case 32:
+                        $scaler /= 1000;
+                        $unit = '~Electricity';
+                        break;
+                    case 33:
+                        $unit = '~Ampere';
+                        break;
+                    case 35:
+                        $unit = '~Volt';
+                        break;
 
-                case '14.7.0':
-                    $result = stristr($Item, chr(0x622C));
-                    $scaler = $this->Scaler(substr($result, 2, 1));
-                    $value = hexdec($this->Str2Hex(substr($result, 4))) * $scaler;
-                    $this->SendDebug('Value', $value, 0);
-                    $this->AddValue($Index, $value, '~Hertz.50');
+                    case 44:
+                        $unit = '~Hertz';
+                        break;
+                    
+                    default:
+                    $unit = '';
                     break;
+                }
+                $pos += $length+1;
+                $length = $this->length($Item, $pos);
 
-                default:
-                    break;
+                # Scaler ##############################################################
+                $scaler *= pow(10, $this->Value($Item, $pos));
+                $pos += $length+1;
+                $length = $this->length($Item, $pos);
+
+                # Value  ##############################################################
+                $value = $this->Value($Item, $pos) * $scaler;
+                $this->AddValue($Index, round($value, 2), $unit);
+
+                $this->SendDebug('Result', 'Unit: '.$unit.' Scaler: '.$scaler.' Value: '.$value, 0);
             }
         }
 
@@ -181,12 +185,39 @@ class SML_Electricity extends IPSModule
     }
 
 	#================================================================================================
-    private function Scaler($string)
+    private function Value($string, $start)
 	#================================================================================================
     {
-        $dec = hexdec(sprintf('%02X', ord($string)));
-        $scaler = $dec == 0?1:pow(10, $dec-256);
+        $dec = hexdec(sprintf('%02X', ord(substr($string, $start, 1))));
+        if($dec == 1)return 0;
+        if($dec < 98){
+            $dec -=81; 
+            $hex = substr($string, $start+1,$dec);
+            $value = hexdec($this->Str2Hex($hex));
+            if($dec == 1){
+                $value = ($value + pow(2,7))%pow(2,8) - pow(2,7);
+            }elseif($dec == 2){
+                $value = ($value + pow(2,15))%pow(2,16) - pow(2,15);
+            }else{
+                $value = ($value + pow(2,31))%pow(2,32) - pow(2,31);
+            }
+        }else{
+            $hex = substr($string, $start+1,$dec-97);
+            $value = hexdec($this->Str2Hex($hex));
+        }
+        return $value;
+    }
 
-        return $scaler;
+	#================================================================================================
+    private function length($string, $start)
+	#================================================================================================
+    {
+        $dec = hexdec(sprintf('%02X', ord(substr($string, $start, 1))));
+        if($dec == 1){
+            $dec = 97;
+        }elseif($dec < 98){
+            $dec += 16;
+        }
+        return $dec-97;
     }
 }

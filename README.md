@@ -17,15 +17,16 @@ Fertig!
 
 ## Changelog
 
-| Version | Changes								            |
+| Version | Änderungen							            |
 | --------|-------------------------------------------------|
 | V1.00   | Basisversion					            	|
+| V1.01   | Auswertung umgestellt   		            	|
 
 ## License
 
 MIT License
 
-Copyright (c) 2021 nefiertsrebliS
+Copyright (c) 2022 nefiertsrebliS
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
