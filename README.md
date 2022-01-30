@@ -21,6 +21,7 @@ Fertig!
 | --------|-------------------------------------------------|
 | V1.00   | Basisversion					            	|
 | V1.01   | Auswertung umgestellt   		            	|
+| V1.02   | Fix: 0-Werte werden nicht aktualisiert         	|
 
 ## License
 

@@ -157,7 +157,11 @@ class SML_Electricity extends IPSModule
 	#================================================================================================
     {
         $this->RegisterVariableFloat(md5($Index), $Index, $Profile);
-        if($Value != 0) $this->SetValue(md5($Index), $Value);
+        if($Profile == '~Electricity'){
+            if($Value != 0) $this->SetValue(md5($Index), $Value);
+        }else{
+            $this->SetValue(md5($Index), $Value);
+        }
     }
 
 	#================================================================================================
