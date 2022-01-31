@@ -23,6 +23,7 @@ Fertig!
 | V1.01   | Auswertung umgestellt   		            	|
 | V1.02   | Fix: 0-Werte werden nicht aktualisiert         	|
 | V1.03   | Neu: Decodierung auf SML-Standard optimiert    	|
+| V1.04   | Neu: Checksummen-Test von @mischo22 ergänzt    	|
 
 ## License
 

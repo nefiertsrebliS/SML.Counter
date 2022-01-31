@@ -68,6 +68,11 @@ class SML_Electricity extends IPSModule
         $data = json_decode($JSONString);
         $this->SendDebug("Received", utf8_decode($data->Buffer), 1);
 
+        if ($this->smlCheckCrc('1B1B1B1B01010101'.$this->Str2Hex(utf8_decode($data->Buffer))) !== true){
+            $this->SendDebug('Error', 'SML-String not valid', 0);
+            return;
+        }
+        
         $this->SetBuffer('Record', $this->Str2Hex(utf8_decode($data->Buffer)));
         $this->SetBuffer('Position', 0);
 
@@ -267,5 +272,94 @@ class SML_Electricity extends IPSModule
         }
 
         return $hex;
+    }
+
+	#================================================================================================
+    private function crcReverseChar($char)
+	#================================================================================================
+    {
+        $byte = ord($char);
+        $tmp = 0;
+        for($i = 0; $i < 8; ++$i){
+            if($byte & (1 << $i)){
+                $tmp |= (1 << (7 - $i));
+            }
+        }
+        return chr($tmp);
+    }
+
+	#================================================================================================
+    private function crcReverseString($str)
+	#================================================================================================
+    {
+        $m = 0;
+        $n = strlen($str) - 1;
+        while($m <= $n){
+            if($m == $n){
+                $str[$m] = reverseChar($str[$m]);
+                break;
+            }
+            $ord1 = $this->crcReverseChar($str[$m]);
+            $ord2 = $this->crcReverseChar($str[$n]);
+            $str[$m] = $ord2;
+            $str[$n] = $ord1;
+            $m++;
+            $n--;
+        }
+        return $str;
+    }
+
+	#================================================================================================
+    private function crc16($str, $polynomial, $initValue, $xOrValue, $inputReverse = false, $outputReverse = false)
+	#================================================================================================
+    {
+        $crc = $initValue;
+
+        for($i = 0; $i < strlen($str); $i++){
+            if($inputReverse){
+                $c = ord($this->crcReverseChar($str[$i]));
+            }else{
+                $c = ord($str[$i]);
+            }
+            $crc ^= ($c << 8);
+            for($j = 0; $j < 8; ++$j){
+                if($crc & 0x8000){
+                    $crc = (($crc << 1) & 0xffff) ^ $polynomial;
+                }else{
+                    $crc = ($crc << 1) & 0xffff;
+                }
+            }
+        }
+
+        if($outputReverse){
+            $ret = pack('cc', $crc & 0xff, ($crc >> 8) & 0xff);
+            $ret = $this->crcReverseString($ret);
+            $arr = unpack('vshort', $ret);
+            $crc = $arr['short'];
+        }
+
+        $crc = $crc ^ $xOrValue;
+        $crc = $crc & 0xFFFF;
+        return $crc;
+    }
+
+	#================================================================================================
+    private function smlCheckCrc($smlPaketHex)
+	#================================================================================================
+    {
+        $result = false;
+
+        if(strlen($smlPaketHex)>0){
+            $smlPaket = hex2bin($smlPaketHex);
+
+            $crc = $this->crc16(substr($smlPaket,0,-2), 0x1021, 0xffff, 0xffff, true, true);
+            $crcHex = (string) sprintf('%04X', $crc);
+
+            if((substr($smlPaketHex, -4,-2)===substr($crcHex, 2)) && (substr($smlPaketHex, -2)===substr($crcHex,0,-2))){
+                $result = true;
+            }
+        }
+
+        return $result;
     }
 }
