@@ -1,6 +1,5 @@
 <?php
 
-
 class SML_Electricity extends IPSModule
 {
 
@@ -69,37 +68,103 @@ class SML_Electricity extends IPSModule
         $data = json_decode($JSONString);
         $this->SendDebug("Received", utf8_decode($data->Buffer), 1);
 
-        $Items = explode("\x01\x77\x07\x01\x00", utf8_decode($data->Buffer));
+        $this->SetBuffer('Record', $this->Str2Hex(utf8_decode($data->Buffer)));
+        $this->SetBuffer('Position', 0);
 
-        foreach ($Items as $Item) {
-            $Typ = $this->Index(substr($Item, 0,1));
+        for($i = 0; $i < 3; $i++){
+            if(hexdec(substr($this->GetBuffer('Record'), intval($this->GetBuffer('Position')), 1)) == 7){
+                $this->GetList();
+            }else{
+                break;
+            }
+        }
+        if($i>2) $this->SetReceiveDataFilter(".*BLOCKED.*");
+    }
 
-            if($Typ == 0 || $Typ > 95) continue;    # keine Zählerdaten
+    #================================================================================================
+    private function GetString()
+	#================================================================================================
+    {
+        $pos = intval($this->GetBuffer('Position'));
+        $rec = $this->GetBuffer('Record');
 
-            $Index = $this->Index(substr($Item, 0,3));
-            $this->SendDebug($Index, $Item, 1);
-            $pos = 3;
+        $pre = hexdec(substr($rec, $pos, 1));
+        if($pre == 8){
+            $anz = bindec(decbin(hexdec(substr($rec, $pos+1, 1))).substr("0000".decbin(hexdec(substr($rec, $pos+2, 2))),-4));
+            $pos += 2;
+        }else{
+            $anz = hexdec(substr($rec, $pos+1, 1));
+        }
 
-            if($this->length($Item, $pos) == 158){
-                $pos++;
-                $length = $this->length($Item, $pos);
-                $pos += $length+1;
-                $length = $this->length($Item, $pos);
+        if($anz > 0){
+            $result = substr($rec, $pos + 2, 2*($anz-1));
+            $pos += 2 * ($anz-1);
+            $this->SetBuffer('Position', $pos);
+            return $result;
+        }else{
+            $pos +=2;
+            $this->SetBuffer('Position', $pos);
+        }
+    }
 
-                # Sonderdaten #########################################################
-                if($length == 17){
-                    $pos++;
-                    $length = $this->length($Item, $pos);
-                    $pos += $length+1;
-                    $length = $this->length($Item, $pos);
-                    $pos += $length;
-                }
-                $pos++;
-                $length = $this->length($Item, $pos);
+	#================================================================================================
+    private function GetList()
+	#================================================================================================
+    {
+        $pos = intval($this->GetBuffer('Position'));
+        $rec = $this->GetBuffer('Record');
+
+        $pre = hexdec(substr($rec, $pos, 1));
+        if($pre == 15){
+            $anz = bindec(decbin(hexdec(substr($rec, $pos+1, 1))).substr("0000".decbin(hexdec(substr($rec, $pos+2, 2))),-4));
+            $pos += 2;
+        }else{
+            $anz = hexdec(substr($rec, $pos+1, 1));
+        }
+        $this->SetBuffer('Position', $pos);
+
+        $array = array();
+        for ($i = 0; $i < $anz; $i++) {
+            $pos = intval($this->GetBuffer('Position'));
+            $pos += 2;
+            $this->SetBuffer('Position', $pos);
+
+            switch(hexdec(substr($rec, $pos, 1))){
+                case 0:
+                    $array[] = $this->GetString();
+                    break;
+                case 5:
+                    $string = $this->GetString();
+                    $array[] = $this->Value($string, true);
+                    break;
+                case 6:
+                    $string = $this->GetString();
+                    $array[] = $this->Value($string, false);
+                    break;
+                case 15:
+                case 7:
+                    $array[] = $this->GetList();
+                    break;
+            }
+        }
+        $this->GetProperties($array);
+        return $array;
+    }
+
+	#================================================================================================
+    private function GetProperties($array)
+	#================================================================================================
+    {
+
+        if(!is_array($array) || count($array)<7)return;
+        if(is_string($array[0]) && strlen($array[0]) == 12){
+            $Typ = hexdec(substr($array[0], 4,2));
+            if($Typ > 0 && $Typ < 96){
+                $Index = $this->Index(substr($array[0], 4,6));
 
                 # Unit   ##############################################################
                 $scaler = 1;
-                switch ($this->Value($Item, $pos)) {
+                switch ($array[3]) {
                     case 8:
                         if (!IPS_VariableProfileExists('Angle.EHZ')) {
                             IPS_CreateVariableProfile('Angle.EHZ', 2);
@@ -133,23 +198,51 @@ class SML_Electricity extends IPSModule
                     $unit = '';
                     break;
                 }
-                $pos += $length+1;
-                $length = $this->length($Item, $pos);
 
                 # Scaler ##############################################################
-                $scaler *= pow(10, $this->Value($Item, $pos));
-                $pos += $length+1;
-                $length = $this->length($Item, $pos);
+                $scaler *= pow(10, $array[4]);
 
                 # Value  ##############################################################
-                $value = $this->Value($Item, $pos) * $scaler;
+                $value = $array[5] * $scaler;
                 $this->AddValue($Index, round($value, 2), $unit);
 
-                $this->SendDebug('Result', 'Unit: '.$unit.' Scaler: '.$scaler.' Value: '.$value, 0);
+                $this->SendDebug($Index, "Unit: $unit -- Scaler: $scaler  -- Value: $value", 0);
+            }
+        }            
+
+        return;
+    }
+
+	#================================================================================================
+    private function Index($string)
+	#================================================================================================
+    {
+        $index = '';
+        for ($i = 0; $i < strlen($string); $i+=2) {
+            $index .= hexdec(substr($string,$i,2)).'.';
+        }
+
+        return substr($index, 0, -1);
+    }
+
+	#================================================================================================
+    private function Value($string, $signed)
+	#================================================================================================
+    {
+        $dec = strlen($string)/2;
+        $value = hexdec($string);
+
+        if($signed){
+            if($dec == 1){
+                $value = ($value + pow(2,7))%pow(2,8) - pow(2,7);
+            }elseif($dec == 2){
+                $value = ($value + pow(2,15))%pow(2,16) - pow(2,15);
+            }else{
+                $value = ($value + pow(2,31))%pow(2,32) - pow(2,31);
             }
         }
 
-        $this->SetReceiveDataFilter(".*BLOCKED.*");
+        return $value;
     }
 
 	#================================================================================================
@@ -174,54 +267,5 @@ class SML_Electricity extends IPSModule
         }
 
         return $hex;
-    }
-
-	#================================================================================================
-    private function Index($string)
-	#================================================================================================
-    {
-        $index = '';
-        for ($i = 0; $i < strlen($string); $i++) {
-            $index .= hexdec(sprintf('%02X', ord($string[$i]))).'.';
-        }
-
-        return substr($index, 0, -1);
-    }
-
-	#================================================================================================
-    private function Value($string, $start)
-	#================================================================================================
-    {
-        $dec = hexdec(sprintf('%02X', ord(substr($string, $start, 1))));
-        if($dec == 1)return 0;
-        if($dec < 98){
-            $dec -=81; 
-            $hex = substr($string, $start+1,$dec);
-            $value = hexdec($this->Str2Hex($hex));
-            if($dec == 1){
-                $value = ($value + pow(2,7))%pow(2,8) - pow(2,7);
-            }elseif($dec == 2){
-                $value = ($value + pow(2,15))%pow(2,16) - pow(2,15);
-            }else{
-                $value = ($value + pow(2,31))%pow(2,32) - pow(2,31);
-            }
-        }else{
-            $hex = substr($string, $start+1,$dec-97);
-            $value = hexdec($this->Str2Hex($hex));
-        }
-        return $value;
-    }
-
-	#================================================================================================
-    private function length($string, $start)
-	#================================================================================================
-    {
-        $dec = hexdec(sprintf('%02X', ord(substr($string, $start, 1))));
-        if($dec == 1){
-            $dec = 97;
-        }elseif($dec < 98){
-            $dec += 16;
-        }
-        return $dec-97;
     }
 }

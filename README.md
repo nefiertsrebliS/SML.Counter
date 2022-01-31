@@ -22,6 +22,7 @@ Fertig!
 | V1.00   | Basisversion					            	|
 | V1.01   | Auswertung umgestellt   		            	|
 | V1.02   | Fix: 0-Werte werden nicht aktualisiert         	|
+| V1.03   | Neu: Decodierung auf SML-Standard optimiert    	|
 
 ## License
 
