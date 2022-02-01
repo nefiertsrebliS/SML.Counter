@@ -24,6 +24,7 @@ Fertig!
 | V1.02   | Fix: 0-Werte werden nicht aktualisiert         	|
 | V1.03   | Neu: Decodierung auf SML-Standard optimiert    	|
 | V1.04   | Neu: Checksummen-Test von @mischo22 ergänzt    	|
+| V1.05   | Neu: Basisprüfung, Prüfungen abschaltbar    	|
 
 ## License
 

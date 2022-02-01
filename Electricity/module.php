@@ -11,6 +11,8 @@ class SML_Electricity extends IPSModule
         parent::Create();
 
         $this->RegisterPropertyInteger('Update', 1);
+        $this->RegisterPropertyBoolean('BasicCheck', true);
+        $this->RegisterPropertyBoolean('CrcCheck', false);
 
 		#----------------------------------------------------------------------------------------
 		# Timer zum Aktualisieren der Daten
@@ -68,12 +70,22 @@ class SML_Electricity extends IPSModule
         $data = json_decode($JSONString);
         $this->SendDebug("Received", utf8_decode($data->Buffer), 1);
 
-        if ($this->smlCheckCrc('1B1B1B1B01010101'.$this->Str2Hex(utf8_decode($data->Buffer))) !== true){
-            $this->SendDebug('Error', 'SML-String not valid', 0);
-            return;
+        $this->SetBuffer('Record', $this->Str2Hex(utf8_decode($data->Buffer)));
+
+        if($this->ReadPropertyBoolean('BasicCheck')){
+            if(!$this->BasicCheck($this->GetBuffer('Record'))){
+                $this->SendDebug('Error', 'SML-String not valid', 0);
+                return;
+            }
+        }
+
+        if($this->ReadPropertyBoolean('CrcCheck')){
+            if ($this->smlCheckCrc('1B1B1B1B01010101'.$this->GetBuffer('Record')) !== true){
+                $this->SendDebug('Error', 'SML-String not valid', 0);
+                return;
+            }
         }
         
-        $this->SetBuffer('Record', $this->Str2Hex(utf8_decode($data->Buffer)));
         $this->SetBuffer('Position', 0);
 
         for($i = 0; $i < 3; $i++){
@@ -272,6 +284,19 @@ class SML_Electricity extends IPSModule
         }
 
         return $hex;
+    }
+
+	#================================================================================================
+    private function BasicCheck($string)
+	#================================================================================================
+    {
+        if(strlen($string)%4 != 0)return false;
+        if(substr($string,-16, 10) != '1B1B1B1B1A')return false;
+        $fill = hexdec(substr($string, -6, 2));
+        $fill = ($fill +1)*2;
+        if(hexdec(substr($string,-$fill-16, $fill)) != 0)return false;
+
+        return true;
     }
 
 	#================================================================================================
