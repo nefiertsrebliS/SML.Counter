@@ -251,12 +251,14 @@ class SML_Electricity extends IPSModule
 
         if($signed){
             if($dec == 1){
-                $value = ($value + pow(2,7))%pow(2,8) - pow(2,7);
+                $pow = 8;
             }elseif($dec == 2){
-                $value = ($value + pow(2,15))%pow(2,16) - pow(2,15);
+                $pow = 16;
             }else{
-                $value = ($value + pow(2,31))%pow(2,32) - pow(2,31);
+                $pow = 32;
             }
+            $value = ($value + pow(2,$pow-1))/pow(2,$pow);
+            $value = ($value - floor($value))*pow(2,$pow) - pow(2,$pow-1);
         }
 
         return $value;
