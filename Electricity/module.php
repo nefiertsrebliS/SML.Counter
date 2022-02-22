@@ -252,13 +252,7 @@ class SML_Electricity extends IPSModule
         $value = hexdec($string);
 
         if($signed){
-            if($dec == 1){
-                $pow = 8;
-            }elseif($dec == 2){
-                $pow = 16;
-            }else{
-                $pow = 32;
-            }
+            $pow = $dec * 8;
             $value = ($value + pow(2,$pow-1))/pow(2,$pow);
             $value = ($value - floor($value))*pow(2,$pow) - pow(2,$pow-1);
         }

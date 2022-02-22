@@ -27,6 +27,7 @@ Fertig!
 | V1.05   | Neu: Basisprüfung, Prüfungen abschaltbar    	|
 | V1.06   | Fix: Modulo-Fehler bei 32-bit-Systemen      	|
 | V1.07   | Neu: Sende Eröffnungssequenz                  	|
+| V1.08   | Fix: 24-bit signed Integer                  	|
 
 ## License
 
