@@ -249,16 +249,22 @@ class SML_Electricity extends IPSModule
     private function Value($string, $signed)
 	#================================================================================================
     {
-        $dec = strlen($string)/2;
-        $value = hexdec($string);
-
         if($signed){
-            $pow = $dec * 8;
-            $value = ($value + pow(2,$pow-1))/pow(2,$pow);
-            $value = ($value - floor($value))*pow(2,$pow) - pow(2,$pow-1);
+            for($i = 0; $i < strlen($string); $i+=2){
+                if(substr($string, $i, 2) != 'FF'){
+                    if($i > 0)$string = substr($string, $i -2);
+                    break;
+                }
+            }
+            $ref = '7';
+            for($i = 1; $i < strlen($string); $i++)$ref .='F';
         }
-
-        return $value;
+        if($signed && (hexdec($ref) - hexdec($string)) < 0){
+            $ref = str_replace('7', 'F', $ref);
+            return hexdec($string) - hexdec($ref) - 1;
+        }else{
+            return hexdec($string);
+        }
     }
 
 	#================================================================================================
