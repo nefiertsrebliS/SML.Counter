@@ -179,7 +179,7 @@ class SML_Electricity extends IPSModule
         if(is_string($array[0]) && strlen($array[0]) == 12){
             $Typ = hexdec(substr($array[0], 4,2));
             if($Typ > 0 && $Typ < 96){
-                $Index = $this->Index(substr($array[0], 4,6));
+                $Index = $this->Index(substr($array[0], 4));
 
                 # Unit   ##############################################################
                 $scaler = 1;
@@ -237,11 +237,12 @@ class SML_Electricity extends IPSModule
 	#================================================================================================
     {
         $index = '';
-        for ($i = 0; $i < strlen($string); $i+=2) {
+        for ($i = 0; $i < strlen($string) -2; $i+=2) {
             $index .= hexdec(substr($string,$i,2)).'.';
         }
-
-        return substr($index, 0, -1);
+        $index = substr($index, 0, -1);
+        if(hexdec(substr($string,$i,2)) !== 255) $index .= '*'.hexdec(substr($string,$i,2));
+        return $index;
     }
 
 	#================================================================================================
