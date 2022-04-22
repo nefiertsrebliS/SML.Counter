@@ -196,6 +196,7 @@ class SML_Electricity extends IPSModule
                     case 27:
                     case 29:
                         $unit = '~Watt';
+                        if(IPS_GetKernelVersion() < 6.1)$unit = '~Watt.14490';
                         break;
                     case 30:
                     case 32:

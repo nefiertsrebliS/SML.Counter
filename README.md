@@ -29,6 +29,7 @@ Fertig!
 | V1.07   | Neu: Sende Eröffnungssequenz                  	|
 | V1.08   | Fix: 24-bit signed Integer                  	|
 | V1.09   | Neu: Unterstützung historischer Werte<br>Neu: Kompatibel ab IP-Symcon V5.3<br>Fix: Rundungsfehler 	|
+| V1.10   | Fix: Profil Watt für IPS-Version < 6.1       	|
 
 ## License
 
