@@ -14,6 +14,7 @@ class SML_Electricity extends IPSModule
         $this->RegisterPropertyBoolean('sendOpeningSequence', false);
         $this->RegisterPropertyBoolean('BasicCheck', true);
         $this->RegisterPropertyBoolean('CrcCheck', false);
+        $this->RegisterPropertyBoolean('AddMissing', true);
 
 		#----------------------------------------------------------------------------------------
 		# Timer zum Aktualisieren der Daten
@@ -178,8 +179,8 @@ class SML_Electricity extends IPSModule
         if(!is_array($array) || count($array)<7)return;
         if(is_string($array[0]) && strlen($array[0]) == 12){
             $Typ = hexdec(substr($array[0], 4,2));
+            $Index = $this->Index(substr($array[0], 4));
             if($Typ > 0 && $Typ < 96){
-                $Index = $this->Index(substr($array[0], 4));
 
                 # Unit   ##############################################################
                 $scaler = 1;
@@ -224,7 +225,7 @@ class SML_Electricity extends IPSModule
 
                 # Value  ##############################################################
                 $value = $array[5] * $scaler;
-                $this->AddValue($Index, round($value, 2), $unit);
+                $this->AddValue($Index, $value, $unit);
 
                 $this->SendDebug($Index, "Unit: $unit -- Scaler: $scaler  -- Value: $value", 0);
             }
@@ -272,7 +273,8 @@ class SML_Electricity extends IPSModule
     private function AddValue($Index, $Value, $Profile)
 	#================================================================================================
     {
-        $this->RegisterVariableFloat(md5($Index), $Index, $Profile);
+        if($this->ReadPropertyBoolean('AddMissing')) $this->RegisterVariableFloat(md5($Index), $Index, $Profile);
+        if(@$this->GetIDForIdent(md5($Index)) === false)return;
         if($Profile == '~Electricity'){
             if($Value != 0) $this->SetValue(md5($Index), $Value);
         }else{

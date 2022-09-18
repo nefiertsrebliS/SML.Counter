@@ -30,6 +30,7 @@ Fertig!
 | V1.08   | Fix: 24-bit signed Integer                  	|
 | V1.09   | Neu: Unterstützung historischer Werte<br>Neu: Kompatibel ab IP-Symcon V5.3<br>Fix: Rundungsfehler 	|
 | V1.10   | Fix: Profil Watt für IPS-Version < 6.1       	|
+| V1.11   | Neu: Option zum Anlegen fehlender Variablen<br>Fix: Werte werden nicht mehr gerundet    	|
 
 ## License
 
