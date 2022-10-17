@@ -31,6 +31,7 @@ Fertig!
 | V1.09   | Neu: Unterstützung historischer Werte<br>Neu: Kompatibel ab IP-Symcon V5.3<br>Fix: Rundungsfehler 	|
 | V1.10   | Fix: Profil Watt für IPS-Version < 6.1       	|
 | V1.11   | Neu: Option zum Anlegen fehlender Variablen<br>Fix: Werte werden nicht mehr gerundet    	|
+| V1.12   | Fix: Aktualisierungsinterval bei kurzen Datensätzen    	|
 
 ## License
 

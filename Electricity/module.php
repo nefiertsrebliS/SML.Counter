@@ -98,7 +98,7 @@ class SML_Electricity extends IPSModule
                 break;
             }
         }
-        if($i>2) $this->SetReceiveDataFilter(".*BLOCKED.*");
+        $this->SetReceiveDataFilter(".*BLOCKED.*");
     }
 
     #================================================================================================
