@@ -356,22 +356,4 @@ class SML_Electricity_HTTP extends IPSModule
 
         return $result;
     }
-
-	#================================================================================================
-	private function SendInit() 
-	#================================================================================================
-	{
-        if(!$this->HasActiveParent()){
-            $this->SendDebug('Error', 'Interface not active', 0);
-            return;
-        }
-
-        $json  = '{"DataID":"{79827379-F36E-4ADA-8A95-5F8D1DC92FA9}","Buffer":"\u001b\u001b\u001b\u001b';
-        $json .= '\u0001\u0001\u0001\u0001v\u00030Fb\u0000b\u0000re\u0000\u0000\u0001\u0000w\u0001\u0001';
-        $json .= '\u0001\u0001\u0001\u0001\u0001c\u0096\u0098\u0000v\u000319b\u0000b\u0000re\u0000\u0000';
-        $json .= '\u0007\u0000u\u0001\u0001\u0001\u0001\u0001c\u008b\u00b3\u0000v\u00031Ab\u0000b\u0000re';
-        $json .= '\u0000\u0000\u0002\u0000q\u0001cI\u0091\u0000\u0000\u0000\u001b\u001b\u001b\u001b\u001a';
-        $json .= '\u0002\u00bdi"}';
-        $this->SendDataToParent($json);
-	}
 }
