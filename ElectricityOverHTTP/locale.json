@@ -1,0 +1,14 @@
+{
+	"translations": {
+		"de": { 
+			"Updateinterval": "Aktualisierungsintervall",
+			"Seconds": "Sekunden",
+			"Send Opening Sequence": "Sende Eröffnungssequenz",
+			"Basic Settings": "Grundeinstellungen",
+			"Expert Settings": "Experten-Einstellungen",
+			"Basic Record-Validation": "Einfache Datensatzprüfung",
+			"Record-Validation by Checksum": "Datensatzprüfung per Prüfsumme",
+			"Add missing Variables": "fehlende Variablen anlegen"
+		}
+	}
+}

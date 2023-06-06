@@ -32,6 +32,7 @@ Fertig!
 | V1.10   | Fix: Profil Watt für IPS-Version < 6.1       	|
 | V1.11   | Neu: Option zum Anlegen fehlender Variablen<br>Fix: Werte werden nicht mehr gerundet    	|
 | V1.12   | Fix: Aktualisierungsinterval bei kurzen Datensätzen    	|
+| V1.13   | Neu: SML-Counter über HTTP-Client           	|
 
 ## License
 
