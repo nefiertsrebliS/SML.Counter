@@ -32,10 +32,10 @@ class SML_Electricity_HTTP extends IPSModule
 	#================================================================================================
     {
         $data = json_decode($JSONString);
-        $this->SendDebug("Received", utf8_decode($data->Buffer), 0);
+        $this->SendDebug("Received", utf8_decode($data->Buffer), 1);
 
-        $data->Buffer = str_replace(' ', '',  utf8_decode($data->Buffer));
-        $this->SetBuffer('Record', substr($data->Buffer, 16));
+        $record = $this->Str2Hex(utf8_decode($data->Buffer));
+        $this->SetBuffer('Record', substr($record, 16));
 
         if($this->ReadPropertyBoolean('BasicCheck')){
             if(!$this->BasicCheck($this->GetBuffer('Record'))){
