@@ -1,17 +1,23 @@
 # SML-Counter
 
 ## Grundsätzliches
-Die Bibliothek dient dazu SML (Smart Message Language) basierte Zähler per Infrarot-Lese/Schreibkopf in IP-Symcon einzubinden. Am weitesten verbreitet sind die elektronischen Hausstromzähler. 
+Die Bibliothek dient dazu SML (Smart Message Language) basierte Zähler per Infrarot-Lese/Schreibkopf oder eine HTTP-Schnittstelle (z.B. Tibber) in IP-Symcon einzubinden. Am weitesten verbreitet sind die elektronischen Hausstromzähler. 
 
 Typischerweise ist die Infrarot-Schnittstelle vom Netzversorger aus Datenschutzgründen gesperrt. Wer seinen Zähler in den eigenen 4 Wänden hat, oder wen fremde Blicke auf die eigenen Daten nicht stören, kann die Schnittstelle per PIN freischalten. Die PIN gibt es beim Netzversorger.
 
 Für die Datenübertragung vom Zähler zum IP-Symcon-Server wird ein USB-Lese/Schreibkopf eingesetzt.
 
-## Konfiguration
+## Konfiguration 
+### IR-Lesekopf
 
 * In den IO-Instanzen einen Serial-Port erzeugen. Bei der Konfiguration der Baudrate bitte die Angaben des Zähler-Herstellers beachten. Typische Werte sind 300 oder 9600. 
 * Im Objektbaum eine SML_Electricity-Instanz erzeugen. Hierdurch wird automatisch eine Cutter-Instanz im Splitter-Bereich angelegt und konfiguriert.
 * Im letzten Schritt noch die Cutter-Instanz mit dem Serial-Port verbinden.
+
+### HTTP-Schnittstelle
+
+* Im Objektbaum eine SML_over_HTTP-Instanz erzeugen. Hierdurch wird automatisch eine HTTP-Client-Instanz angelegt.
+* In der HTTP-Client-Instanz mindestens die URL und das Update-Interval eintragen und speichern.
 
 Fertig!
 
