@@ -417,6 +417,6 @@ class SML_Electricity extends IPSModule
             'Buffer' => hex2bin($seq)
         ];
         $this->SendDebug(__FUNCTION__,json_encode($data), 0);
-        $this->SendDataToParent($json);
+        $this->SendDataToParent(json_encode($data));
 	}
 }
