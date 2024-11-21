@@ -3,7 +3,10 @@
   [
     {"type": "ExpansionPanel", "caption": "Basic Settings", "visible": true, "expanded": true, "items": [
       { "type": "NumberSpinner", "name": "Update", "caption": "Updateinterval", "suffix": "Seconds", "minimum": 1},
-      { "type": "CheckBox", "name": "sendOpeningSequence", "caption": "Send Opening Sequence"}
+      { "type": "RowLayout", "items": [
+          { "type": "CheckBox", "name": "sendOpeningSequence", "caption": "Send Opening Sequence"},
+          { "type": "ValidationTextBox", "name": "OpeningSequence", "caption": "Opening Sequence", "validate": "^[A-Fa-f0-9]+$|^$"}
+      ]}
     ]},
     {"type": "ExpansionPanel", "caption": "Expert Settings", "visible": true, "items": [
 			{"name": "BasicCheck", "type": "CheckBox", "caption": "Basic Record-Validation" },

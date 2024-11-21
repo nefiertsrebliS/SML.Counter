@@ -13,6 +13,7 @@ Für die Datenübertragung vom Zähler zum IP-Symcon-Server wird ein USB-Lese/Sc
 * In den IO-Instanzen einen Serial-Port erzeugen. Bei der Konfiguration der Baudrate bitte die Angaben des Zähler-Herstellers beachten. Typische Werte sind 300 oder 9600. 
 * Im Objektbaum eine SML_Electricity-Instanz erzeugen. Hierdurch wird automatisch eine Cutter-Instanz im Splitter-Bereich angelegt und konfiguriert.
 * Im letzten Schritt noch die Cutter-Instanz mit dem Serial-Port verbinden.
+* Sollte der SML-Zähler eine Eröffnungssequenz zum Senden der Daten benötigen, so ist diese als HEX-String (z.B. "2F3F210D0A") in das Feld "Eröffnungssequenz" einzutragen und das Senden einzuschalten.
 
 ### HTTP-Schnittstelle
 
@@ -39,6 +40,7 @@ Fertig!
 | V1.11   | Neu: Option zum Anlegen fehlender Variablen<br>Fix: Werte werden nicht mehr gerundet    	|
 | V1.12   | Fix: Aktualisierungsinterval bei kurzen Datensätzen    	|
 | V1.13   | Neu: SML-Counter über HTTP-Client           	|
+| V1.13   | Neu: Individuelle Eröffnungssequenz           	|
 
 ## License
 
