@@ -20,6 +20,11 @@ Für die Datenübertragung vom Zähler zum IP-Symcon-Server wird ein USB-Lese/Sc
 * Im Objektbaum eine SML_over_HTTP-Instanz erzeugen. Hierdurch wird automatisch eine HTTP-Client-Instanz angelegt.
 * In der HTTP-Client-Instanz mindestens die URL und das Update-Interval eintragen und speichern.
 
+### MQTT-Schnittstelle
+
+* Im Objektbaum eine SML_over_MQTT-Instanz erzeugen. Hierdurch wird automatisch eine  Verbindung zum MQTT-Server angelegt und ggf. konfiguriert.
+* Im letzten Schritt noch das MQTT-Topic des MQTT-Smartmeter-Interfaces eingeben und speichern.
+
 Fertig!
 
 ## Changelog
@@ -40,13 +45,14 @@ Fertig!
 | V1.11   | Neu: Option zum Anlegen fehlender Variablen<br>Fix: Werte werden nicht mehr gerundet    	|
 | V1.12   | Fix: Aktualisierungsinterval bei kurzen Datensätzen    	|
 | V1.13   | Neu: SML-Counter über HTTP-Client           	|
-| V1.13   | Neu: Individuelle Eröffnungssequenz           	|
+| V1.14   | Neu: Individuelle Eröffnungssequenz           	|
+| V1.15   | Neu: SML-Counter über MQTT                     	|
 
 ## License
 
 MIT License
 
-Copyright (c) 2022 nefiertsrebliS
+Copyright (c) 2024 nefiertsrebliS
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
